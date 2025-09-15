@@ -1,116 +1,132 @@
-# 🎵 Template Backend NestJS
+# ⚙️ Automation.Engine
 
-Um **projeto backend** construído com **NestJS**, **Prisma ORM** e documentação com **Swagger (OpenAPI)**.  
-Esse template foi pensado para aplicações **multimódulo** e escaláveis, servindo como base para projetos reais.
+Plataforma de **automação robótica** construída em **.NET 8** aplicando **Arquitetura Limpa (Clean Architecture)**.  
+O projeto combina:
 
----
-
-## 🚀 Tecnologias
-
-- **[NestJS](https://nestjs.com/)** — framework Node.js progressivo
-- **[Prisma ORM](https://www.prisma.io/)** — ORM moderno
-- **[PostgreSQL](https://www.postgresql.org/)** — banco de dados relacional
-- **[Swagger](https://swagger.io/)** — documentação interativa da API
-- **TypeScript**
+- 🌐 **Web Crawling** → captura de dados da web.  
+- 🤖 **RPA (Robotic Process Automation)** → automação de processos em sistemas/web.  
+- 🗄 **Persistência** em **PostgreSQL** via Entity Framework Core.  
+- ⏰ **Agendamento de tarefas** com Quartz.NET.  
+- 📊 **Logging estruturado** com Serilog.  
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📌 Estrutura da Solução
 
+Automation.Engine.sln
+├── Automation.Engine.Domain # Regras de negócio (entidades + interfaces)
+├── Automation.Engine.Application # Casos de uso (services, DTOs, jobs)
+├── Automation.Engine.Infrastructure # Implementações (EF Core, Crawlers, RPA, Logging)
+└── Automation.Engine.Worker # Worker Service (Quartz + execução contínua)
+
+markdown
+Copiar código
+
+---
+
+## 📂 Detalhes de cada camada
+
+### 🔹 Domain
+- Entidades de negócio (`Quote`, etc).  
+- Interfaces de repositórios e serviços (`IQuoteRepository`).  
+- Não tem dependência de nada externo.  
+
+### 🔹 Application
+- Casos de uso (`QuoteService`).  
+- DTOs de entrada/saída.  
+- Jobs do Quartz (`QuoteJob`).  
+- Depende apenas do **Domain**.  
+
+### 🔹 Infrastructure
+- Implementação dos repositórios (`QuoteRepository`).  
+- DbContext do EF Core (`AutomationContext`).  
+- Crawlers com Selenium/HtmlAgilityPack.  
+- Serviços RPA (automatização de formulários).  
+- Logging com Serilog.  
+
+### 🔹 Worker
+- Ponto de entrada (`Program.cs`).  
+- Configuração do **Quartz.NET** (agendamento).  
+- Injeção de dependência.  
+- Execução contínua como **Worker Service**.  
+
+---
+
+## ⚙️ Tecnologias Usadas
+
+- **.NET 8 Worker Service**  
+- **Entity Framework Core + Npgsql** (PostgreSQL)  
+- **Quartz.NET** (jobs agendados)  
+- **Selenium / HtmlAgilityPack** (crawling e RPA)  
+- **Serilog** (logging estruturado)  
+- **Docker** (opcional para banco e worker)  
+
+---
+
+## 🚀 Como Rodar o Projeto
+
+### 1. Clonar o repositório
 ```bash
-.
-├── prisma/
-│   ├── migrations/          # Migrations do banco
-│   ├── schema.prisma        # Modelos Prisma
-│   └── seed.ts              # Script para popular o banco
-├── src/
-│   ├── app/                 # Módulo principal
-│   ├── auth/                # Autenticação (JWT, etc.)
-│   ├── booking/             # Reservas
-│   ├── chat/                # Chat em tempo real
-│   ├── client-profile/      # Perfis de clientes
-│   ├── database/            # Configuração do banco
-│   ├── musician/            # Módulo de músicos
-│   ├── rating/              # Avaliações
-│   ├── schedule/            # Agenda
-│   ├── user/                # Usuários
-│   ├── venue/               # Locais
-│   ├── main.ts              # Ponto de entrada da aplicação
-├── .env                     # Variáveis de ambiente
-├── .gitignore
-└── README.md
-⚙️ Configuração
-1. Clone o repositório
-bash
-Copiar código
-git clone https://github.com/seu-usuario/template-backend-nestjs.git
-cd template-backend-nestjs
-2. Instale as dependências
-bash
-Copiar código
-npm install
-3. Configure o .env
-env
-Copiar código
-DATABASE_URL="postgresql://user:password@localhost:5432/dbname?schema=public"
-PORT=3000
-JWT_SECRET=super_secret_key
-🗂️ Prisma ORM
-Gerar o cliente Prisma:
+git clone https://github.com/sua-org/Automation.Engine.git
+cd Automation.Engine
+2. Configurar Banco de Dados
+Subir PostgreSQL com Docker:
 
 bash
 Copiar código
-npx prisma generate
-Rodar migrations:
+docker run --name automation-postgres -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=automation -p 5432:5432 -d postgres:15
+Configurar appsettings.json no Worker:
 
+json
+Copiar código
+"ConnectionStrings": {
+  "Postgres": "Host=localhost;Database=automation;Username=postgres;Password=123456"
+}
+3. Criar Migrations
 bash
 Copiar código
-npx prisma migrate dev --name init
-Popular banco com seed:
-
+cd Automation.Engine.Infrastructure
+dotnet ef migrations add InitialCreate -o Persistence/Migrations
+dotnet ef database update
+4. Rodar o Worker
 bash
 Copiar código
-npx prisma db seed
-🏃 Rodando o projeto
-Desenvolvimento
+dotnet run --project Automation.Engine.Worker
+🧪 Testando
+Rodar testes unitários
 bash
 Copiar código
-npm run start:dev
-Produção
-bash
+dotnet test
+Verificar inserts no banco
+sql
 Copiar código
-npm run build
-npm run start:prod
-📚 Swagger
-Após rodar o projeto, acesse:
+SELECT * FROM "Quotes";
+Logs esperados no console:
 
-👉 http://localhost:3000/api
-
-✅ Scripts úteis
-bash
+csharp
 Copiar código
-npm run start       # inicia aplicação
-npm run start:dev   # inicia em modo dev
-npm run build       # build para produção
-npm run lint        # checa lint
-npm run test        # executa testes
-📦 Melhorias futuras
-Multi-tenancy (multi-tenant databases)
+[Quartz] QuoteJob executando...
+[Crawler] Capturado texto: "Frase teste 123"
+[DB] Quote salvo com sucesso!
+[RPA] Formulário preenchido
+📊 Fluxo do Sistema
+O Quartz.NET dispara um Job (QuoteJob).
 
-Autenticação OAuth2 / Social Login
+O Job chama QuoteService (Application).
 
-Cache com Redis
+O QuoteService usa:
 
-Monitoramento com OpenTelemetry
+CrawlerService → captura dados da web.
 
-Integração com filas (BullMQ)
+IQuoteRepository → salva no banco (Postgres via EF Core).
 
-📝 Licença
-MIT — fique à vontade para usar e modificar 🚀
+RpaService → automatiza ações externas.
 
-yaml
-Copiar código
+Logs são gerados pelo Serilog.
 
----
+🏗 Extensibilidade
+Para adicionar um novo crawler → criar serviço em Infrastructure.Crawlers e expor via Application.
 
-👉 Quer que eu já monte esse `README.md` em **formato de arquivo** pra você baixar direto?
+Para adicionar um novo job → criar em Application.Jobs e registrar no Quartz.
+
+Para trocar de banco → alterar apenas Infrastructure (sem mudar Application/Domain).
