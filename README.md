@@ -69,6 +69,7 @@ Copiar código
 ```bash
 git clone https://github.com/sua-org/Automation.Engine.git
 cd Automation.Engine
+
 2. Configurar Banco de Dados
 
 Subir PostgreSQL com Docker:
@@ -79,6 +80,7 @@ json
 "ConnectionStrings": {
   "Postgres": "Host=localhost;Database=automation;Username=postgres;Password=123456"
 }
+
 3. Criar Migrations
 
 cd Automation.Engine.Infrastructure
