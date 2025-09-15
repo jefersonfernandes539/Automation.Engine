@@ -70,32 +70,26 @@ Copiar código
 git clone https://github.com/sua-org/Automation.Engine.git
 cd Automation.Engine
 2. Configurar Banco de Dados
-Subir PostgreSQL com Docker:
 
-bash
-Copiar código
+Subir PostgreSQL com Docker:
 docker run --name automation-postgres -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=automation -p 5432:5432 -d postgres:15
 Configurar appsettings.json no Worker:
 
 json
-Copiar código
 "ConnectionStrings": {
   "Postgres": "Host=localhost;Database=automation;Username=postgres;Password=123456"
 }
 3. Criar Migrations
-bash
-Copiar código
+
 cd Automation.Engine.Infrastructure
 dotnet ef migrations add InitialCreate -o Persistence/Migrations
 dotnet ef database update
+
 4. Rodar o Worker
-bash
-Copiar código
+
 dotnet run --project Automation.Engine.Worker
 🧪 Testando
 Rodar testes unitários
-bash
-Copiar código
 dotnet test
 Verificar inserts no banco
 sql
@@ -103,8 +97,6 @@ Copiar código
 SELECT * FROM "Quotes";
 Logs esperados no console:
 
-csharp
-Copiar código
 [Quartz] QuoteJob executando...
 [Crawler] Capturado texto: "Frase teste 123"
 [DB] Quote salvo com sucesso!
