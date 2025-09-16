@@ -93,7 +93,7 @@ Rodar testes unitários
 dotnet test
 Verificar inserts no banco
 sql
-Copiar código
+
 SELECT * FROM "Quotes";
 Logs esperados no console:
 
