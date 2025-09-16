@@ -13,15 +13,13 @@ O projeto combina:
 
 ## 📌 Estrutura da Solução
 
+```bash
 Automation.Engine.sln
-├── Automation.Engine.Domain # Regras de negócio (entidades + interfaces)
-├── Automation.Engine.Application # Casos de uso (services, DTOs, jobs)
-├── Automation.Engine.Infrastructure # Implementações (EF Core, Crawlers, RPA, Logging)
-└── Automation.Engine.Worker # Worker Service (Quartz + execução contínua)
-
-markdown
-Copiar código
-
+ ├── Automation.Engine.Domain # Regras de negócio (entidades + interfaces)
+ ├── Automation.Engine.Application # Casos de uso (services, DTOs, jobs)
+ ├── Automation.Engine.Infrastructure # Implementações (EF Core, Crawlers, RPA, Logging)
+ └── Automation.Engine.Worker # Worker Service (Quartz + execução contínua)
+```
 ---
 
 ## 📂 Detalhes de cada camada
@@ -95,7 +93,7 @@ Rodar testes unitários
 dotnet test
 Verificar inserts no banco
 sql
-Copiar código
+
 SELECT * FROM "Quotes";
 Logs esperados no console:
 
