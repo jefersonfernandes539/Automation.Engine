@@ -1,4 +1,7 @@
-﻿using Confluent.Kafka;
+﻿using Automation.Engine.Application.DataTransferObjects;
+using Automation.Engine.Domain.Entities;
+using Automation.Engine.Domain.Interfaces;
+using Confluent.Kafka;
 using System.Text.Json;
 
 namespace Automation.Engine.Worker
@@ -10,9 +13,16 @@ namespace Automation.Engine.Worker
         private readonly string _produceTopic = "robot-results";
         private readonly string _groupId = "automation-worker-group";
 
+        private readonly IServiceProvider _serviceProvider;
+
+        public KafkaWorker(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var config = new ConsumerConfig
+            var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = _bootstrapServers,
                 GroupId = _groupId,
@@ -20,7 +30,7 @@ namespace Automation.Engine.Worker
                 EnableAutoCommit = false
             };
 
-            using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
+            using var consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
             consumer.Subscribe(_consumeTopic);
 
             using var producer = new ProducerBuilder<Null, string>(
@@ -34,8 +44,24 @@ namespace Automation.Engine.Worker
                     try
                     {
                         var cr = consumer.Consume(stoppingToken);
-                        Console.WriteLine($"📥 Job recebido: {cr.Message.Value}");
+                        Console.WriteLine($"Job recebido: {cr.Message.Value}");
 
+                        var job = JsonSerializer.Deserialize<JobRequestDto>(cr.Message.Value);
+
+                        using var scope = _serviceProvider.CreateScope();
+                        var crawlerService = scope.ServiceProvider.GetRequiredService<ICrawlerService>();
+                        var quoteRepository = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
+
+                        var quoteFromCrawler = crawlerService.GetQuote();
+
+                        var quoteToSave = new Quote
+                        {
+                            Id = Guid.NewGuid(),
+                            Text = quoteFromCrawler.Text,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        await quoteRepository.SaveAsync(quoteToSave);
                         var jobResult = new
                         {
                             originalMessage = cr.Message.Value,
@@ -51,19 +77,19 @@ namespace Automation.Engine.Worker
                             stoppingToken
                         );
 
-                        Console.WriteLine($"📤 Resultado enviado: {resultJson}");
+                        Console.WriteLine($"Resultado enviado: {resultJson}");
 
                         consumer.Commit(cr);
                     }
                     catch (ConsumeException ex)
                     {
-                        Console.WriteLine($"⚠️ Erro no consumo: {ex.Error.Reason}");
+                        Console.WriteLine($"Erro no consumo: {ex.Error.Reason}");
                     }
                 }
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("🛑 Worker cancelado.");
+                Console.WriteLine("Worker cancelado.");
             }
             finally
             {

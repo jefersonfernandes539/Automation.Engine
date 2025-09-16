@@ -12,10 +12,10 @@ namespace Automation.Engine.Infrastructure.Persistence
             _context = context;
         }
 
-        public Guid Save(Quote quote)
+        public async Task<Guid> SaveAsync(Quote quote)
         {
             _context.Quotes.Add(quote);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return quote.Id;
         }
 

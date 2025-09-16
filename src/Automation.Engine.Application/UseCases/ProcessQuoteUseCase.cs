@@ -15,12 +15,12 @@ namespace Automation.Engine.Application.UseCases
             _rpa = rpa;
         }
 
-        public void Execute()
+        public async void Execute()
         {
             var quote = _crawler.GetQuote();
             Console.WriteLine($"[Crawler] {quote.Text}");
 
-            Guid id = _repo.Save(quote);
+            Guid id = await _repo.SaveAsync(quote);
             Console.WriteLine($"[DB] ID {id} salvo");
 
             var last = _repo.GetLast();

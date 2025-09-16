@@ -4,7 +4,7 @@ namespace Automation.Engine.Domain.Interfaces
 {
     public interface IQuoteRepository
     {
-        Guid Save(Quote quote);
+        Task<Guid> SaveAsync(Quote quote);
         Quote? GetLast();
     }
 }
