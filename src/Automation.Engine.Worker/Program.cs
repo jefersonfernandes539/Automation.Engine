@@ -19,6 +19,8 @@ builder.Services.AddScoped<IRpaService, RpaService>();
 
 builder.Services.AddScoped<ProcessQuoteUseCase>();
 
+builder.Services.AddHostedService<KafkaWorker>();
+
 builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();

@@ -20,7 +20,7 @@ namespace Automation.Engine.Application.UseCases
             var quote = _crawler.GetQuote();
             Console.WriteLine($"[Crawler] {quote.Text}");
 
-            int id = _repo.Save(quote);
+            Guid id = _repo.Save(quote);
             Console.WriteLine($"[DB] ID {id} salvo");
 
             var last = _repo.GetLast();
