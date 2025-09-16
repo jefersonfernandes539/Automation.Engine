@@ -14,13 +14,10 @@ O projeto combina:
 ## 📌 Estrutura da Solução
 
 Automation.Engine.sln
-├── Automation.Engine.Domain # Regras de negócio (entidades + interfaces)
-├── Automation.Engine.Application # Casos de uso (services, DTOs, jobs)
-├── Automation.Engine.Infrastructure # Implementações (EF Core, Crawlers, RPA, Logging)
-└── Automation.Engine.Worker # Worker Service (Quartz + execução contínua)
-
-markdown
-Copiar código
+ ├── Automation.Engine.Domain # Regras de negócio (entidades + interfaces)
+ ├── Automation.Engine.Application # Casos de uso (services, DTOs, jobs)
+ ├── Automation.Engine.Infrastructure # Implementações (EF Core, Crawlers, RPA, Logging)
+ └── Automation.Engine.Worker # Worker Service (Quartz + execução contínua)
 
 ---
 
